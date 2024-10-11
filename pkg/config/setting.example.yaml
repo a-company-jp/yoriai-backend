@@ -7,3 +7,6 @@ line:
 vonage:
   x_vgai_key:
   agent_id:
+firestore:
+  project_id:
+  json_credential_file:

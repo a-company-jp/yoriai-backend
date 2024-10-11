@@ -12,6 +12,7 @@ type config struct {
 	General      General      `yaml:"general"`
 	LineConfig   LineConfig   `yaml:"line"`
 	VonageConfig VonageConfig `yaml:"vonage"`
+	Firestore    Firestore    `yaml:"firestore"`
 }
 
 func init() {
