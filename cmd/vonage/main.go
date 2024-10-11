@@ -15,21 +15,18 @@ const (
 	API_URL = "https://studio-api-us.ai.vonage.com/telephony/make-call"
 )
 
-
-
 type LINEInput struct {
-	phoneNumber string
-	receiverName string
-	callerName string
-	// nullable
+	phoneNumber   string
+	receiverName  string
+	callerName    string
 	remindMessage sql.NullString
 }
 
 func main() {
 	input := LINEInput{
-		phoneNumber: "1234567890",
-		receiverName: "Alisa",
-		callerName: "Bob",
+		phoneNumber:   "1234567890",
+		receiverName:  "Alisa",
+		callerName:    "Bob",
 		remindMessage: sql.NullString{String: "Don't forget to bring your umbrella", Valid: true},
 	}
 	err := CallPhoneApi(input)

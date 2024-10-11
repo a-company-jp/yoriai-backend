@@ -3,13 +3,13 @@ package handler
 import "github.com/gin-gonic/gin"
 
 type VonageWebhookRequest struct {
-	AgentID string `json:"agent_id"`
-	SessionID string `json:"session_id"`
+	AgentID        string `json:"agent_id"`
+	SessionID      string `json:"session_id"`
 	ConversationID string `json:"conversation_id"`
-	Feeling string `json:"feeling"`
-	PhoneNumber string `json:"phone_number"`
-	Message string `json:"message"`
-	TodayActivity string `json:"today_activity"`
+	Feeling        string `json:"feeling"`
+	PhoneNumber    string `json:"phone_number"`
+	Message        string `json:"message"`
+	TodayActivity  string `json:"today_activity"`
 }
 
 type VonageWebhook struct {
