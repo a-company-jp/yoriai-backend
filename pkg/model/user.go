@@ -11,8 +11,10 @@ type User struct {
 type PhoneNumber string
 
 type Target struct {
-	Nickname string      `firestore:"nickname"`
-	Phone    PhoneNumber `firestore:"phone_number"`
-	CallTime string      `firestore:"call_time"` // 12:00
-	Confirm  bool        `firestore:"confirm"`
+	Nickname          string      `firestore:"nickname"`
+	RecipientNickname string      `firestore:"r_nickname"`
+	Phone             PhoneNumber `firestore:"phone_number"`
+	CallTime          string      `firestore:"call_time"` // 12:00
+	RemindMessage     string      `firestore:"remind_message"`
+	Confirm           bool        `firestore:"confirm"`
 }
