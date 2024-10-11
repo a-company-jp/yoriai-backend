@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -14,16 +15,30 @@ const (
 	API_URL = "https://studio-api-us.ai.vonage.com/telephony/make-call"
 )
 
+
+
+type LINEInput struct {
+	phoneNumber string
+	receiverName string
+	callerName string
+	// nullable
+	remindMessage sql.NullString
+}
+
 func main() {
-	phoneNumber := "1234567890"
-	name := "Alisa"
-	err := CallPhoneApi(phoneNumber, name)
+	input := LINEInput{
+		phoneNumber: "1234567890",
+		receiverName: "Alisa",
+		callerName: "Bob",
+		remindMessage: sql.NullString{String: "Don't forget to bring your umbrella", Valid: true},
+	}
+	err := CallPhoneApi(input)
 	if err != nil {
 		fmt.Println("Error making API call:", err)
 	}
 }
 
-func CallPhoneApi(phoneNumber, name string) error {
+func CallPhoneApi(input LINEInput) error {
 	XKey, err := FetchEnvVar("XKey")
 	if err != nil {
 		return err
@@ -34,7 +49,7 @@ func CallPhoneApi(phoneNumber, name string) error {
 		return err
 	}
 
-	requestBody, err := CreateRequestBody(AgentId, phoneNumber, name)
+	requestBody, err := CreateRequestBody(AgentId, input)
 	if err != nil {
 		return err
 	}
@@ -62,14 +77,22 @@ func FetchEnvVar(key string) (string, error) {
 	return value, nil
 }
 
-func CreateRequestBody(agentId, phoneNumber, name string) ([]byte, error) {
+func CreateRequestBody(agentId string, input LINEInput) ([]byte, error) {
 	requestBody, err := json.Marshal(map[string]interface{}{
 		"agent_id": agentId,
-		"to":       phoneNumber,
+		"to":       input.phoneNumber,
 		"session_parameters": []map[string]string{
 			{
+				"name":  "RECEIVER_NAME",
+				"value": input.receiverName,
+			},
+			{
 				"name":  "CALLER_NAME",
-				"value": name,
+				"value": input.callerName,
+			},
+			{
+				"name":  "REMIND_MESSAGE",
+				"value": input.remindMessage.String,
 			},
 		},
 	})
