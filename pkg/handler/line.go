@@ -152,6 +152,8 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 			l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "電話番号の形式が正しくありません。もう一度入力してください。(例: 09012345678)")
 			return
 		}
+		// 先頭の0を81に変換
+		userdata.Target.Phone = model.PhoneNumber("81" + string(userdata.Target.Phone)[1:])
 		_, err := ref.Set(ctx, userdata)
 		if err != nil {
 			slog.Error("failed to set user", err)
