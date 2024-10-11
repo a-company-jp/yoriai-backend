@@ -5,6 +5,9 @@ on:
       - main
 jobs:
   build-and-deploy:
+    concurrency:
+      group: main
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
