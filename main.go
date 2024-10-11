@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"github.com/a-company/yoriai-backend/pkg/config"
 	"github.com/a-company/yoriai-backend/pkg/handler"
 	"github.com/a-company/yoriai-backend/pkg/service/line"
 	"github.com/gin-gonic/gin"
 	"log/slog"
+	"strconv"
 )
 
 func main() {
@@ -27,5 +30,13 @@ func main() {
 
 	vonageWHService := handler.NewVonageWebhook()
 	e.Any("/vonage/webhook", vonageWHService.Handle)
-	e.Run(":11305")
+	port := 8080
+	if config.Config.General.Port != "" {
+		port, err = strconv.Atoi(config.Config.General.Port)
+		if err != nil {
+			slog.Error("failed to load port, invalid format", err)
+			return
+		}
+	}
+	e.Run(fmt.Sprintf(":%d", port))
 }
