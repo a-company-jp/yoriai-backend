@@ -40,5 +40,9 @@ func main() {
 			return
 		}
 	}
+
+	invokeHandler := handler.NewInvokeHandler(fs)
+	e.POST("/invoke", invokeHandler.Handle)
+
 	e.Run(fmt.Sprintf(":%d", port))
 }
