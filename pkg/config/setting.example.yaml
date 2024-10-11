@@ -1,3 +1,5 @@
+general:
+  port: 8080
 line:
   channel_id:
   channel_secret:

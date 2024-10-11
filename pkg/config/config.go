@@ -9,6 +9,7 @@ import (
 var Config config
 
 type config struct {
+	General      General      `yaml:"general"`
 	LineConfig   LineConfig   `yaml:"line"`
 	VonageConfig VonageConfig `yaml:"vonage"`
 }
