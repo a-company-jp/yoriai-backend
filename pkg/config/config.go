@@ -1,8 +1,8 @@
 package config
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v3"
-	"log/slog"
 	"os"
 )
 
@@ -17,11 +17,11 @@ func init() {
 	Config = config{}
 	loc := os.Getenv("ENV_LOCATION")
 	if loc == "" {
-		slog.Error("No ENV_LOCATION found")
+		panic("No ENV_LOCATION found")
 		return
 	}
 	if err := yaml.Unmarshal([]byte(loc), &Config); err != nil {
-		slog.Error("Failed to unmarshal yaml", err)
+		panic(fmt.Errorf("failed to unmarshal yaml: %w", err))
 		return
 	}
 }
