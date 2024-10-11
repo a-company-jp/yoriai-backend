@@ -43,7 +43,7 @@ func (l *LINEWebhookHandler) Handle(c *gin.Context) {
 			// delivery: When a message is successfully delivered to a user. You can't reply to this event.
 		case "follow":
 			// follow: When a user adds your LINE Official Account as a friend, or unblocks your LINE Official Account. You can reply to this event.
-			l.HandleFollowEvent(event.(*webhook.FollowEvent))
+			l.HandleFollowEvent(event.(webhook.FollowEvent))
 		case "leave":
 			// leave: When a user deletes your LINE Official Account or your LINE Official Account leaves, from a group chat or multi-person chat.
 		case "memberJoined":
@@ -68,12 +68,12 @@ func (l *LINEWebhookHandler) Handle(c *gin.Context) {
 	}
 }
 
-func (l *LINEWebhookHandler) HandleFollowEvent(event *webhook.FollowEvent) {
+func (l *LINEWebhookHandler) HandleFollowEvent(event webhook.FollowEvent) {
 	l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "Thank you for adding me as a friend!")
 }
 
-func (l *LINEWebhookHandler) HandleMessageEvent(event *webhook.MessageEvent) {
+func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 }
 
-func (l *LINEWebhookHandler) HandleLeaveEvent(event *webhook.UnfollowEvent) {
+func (l *LINEWebhookHandler) HandleLeaveEvent(event webhook.UnfollowEvent) {
 }
