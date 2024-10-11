@@ -8,6 +8,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"time"
 )
 
 const (
@@ -38,13 +39,17 @@ func (s VonageService) CallPhoneAPI(input PhoneAPIInput) error {
 		return err
 	}
 
-	responseBody, err := sendApiRequest(requestBody, s.conf.VgaiKey)
-	if err != nil {
-		return err
+	for i := 0; i < 20; i++ {
+		responseBody, err := sendApiRequest(requestBody, s.conf.VgaiKey)
+		if err == nil {
+			slog.Info("Response Body:", slog.String("response", responseBody))
+			return nil
+		}
+		slog.Error("Error making API call, retrying...", err)
+		time.Sleep(5 * time.Second)
 	}
-
-	slog.Info("Response Body:", slog.String("response", responseBody))
-	return nil
+	slog.Error("Failed to make API call")
+	return fmt.Errorf("failed to make API call")
 }
 
 func createRequestBody(agentId string, input PhoneAPIInput) ([]byte, error) {
@@ -90,8 +95,13 @@ func sendApiRequest(requestBody []byte, XKey string) (string, error) {
 		slog.Error("Error sending request:", err)
 		return "", err
 	}
-	defer resp.Body.Close()
 
+	if resp.StatusCode >= 300 {
+		slog.Error("Error response status", slog.String("status", resp.Status))
+		return "", fmt.Errorf("response status: %s", resp.Status)
+	}
+
+	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		slog.Error("Error reading response body", err)
