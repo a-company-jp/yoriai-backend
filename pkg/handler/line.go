@@ -63,6 +63,7 @@ func (l *LINEWebhookHandler) Handle(c *gin.Context) {
 			// memberLeft: When a user leaves a group chat or multi-person chat that your LINE Official Account is a member of.
 		case "message":
 			// message: When a user sends a message. You can reply to this event.
+			l.HandleMessageEvent(event.(webhook.MessageEvent))
 		case "module":
 			// module: When a user interacts with a module. You can reply to this event.
 		case "postback":
@@ -94,7 +95,7 @@ func (l *LINEWebhookHandler) HandleFollowEvent(event webhook.FollowEvent) {
 		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "Failed to add you as a friend. Please try again later.")
 		return
 	}
-	l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "Thank you for adding me as a friend!")
+	l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "友達登録ありがとうございます！\n\nまずは電話対象者のニックネームを入力してください")
 }
 
 func (l *LINEWebhookHandler) HandleUnfollowEvent(event webhook.UnfollowEvent) {
@@ -126,6 +127,11 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 	if userdata.Target.Nickname == "" {
 		event.Message.GetType()
 		userdata.Target.Nickname = txtMsg.Text
+		_, err := ref.Set(ctx, userdata)
+		if err != nil {
+			slog.Error("failed to set user", err)
+			return
+		}
 		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "次に電話番号を入力してください (例: 09012345678)")
 		return
 	}
@@ -137,6 +143,11 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 			l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "電話番号の形式が正しくありません。もう一度入力してください。(例: 09012345678)")
 			return
 		}
+		_, err := ref.Set(ctx, userdata)
+		if err != nil {
+			slog.Error("failed to set user", err)
+			return
+		}
 		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "次に希望の通話時間を入力してください")
 		return
 	}
@@ -146,6 +157,11 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 		callTimeRgx := `^([01][0-9]|2[0-3]):00$`
 		if !regexp.MustCompile(callTimeRgx).MatchString(userdata.Target.CallTime) {
 			l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "通話時間の形式が正しくありません")
+			return
+		}
+		_, err := ref.Set(ctx, userdata)
+		if err != nil {
+			slog.Error("failed to set user", err)
 			return
 		}
 		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "登録が完了しました！")
