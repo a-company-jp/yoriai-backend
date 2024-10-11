@@ -23,7 +23,7 @@ func New() *firestore.Client {
 		}
 		data, err := os.ReadFile(config.Config.Firestore.JsonCredentialFile)
 		options := option.WithCredentialsJSON(data)
-		client, err = firestore.NewClient(ctx, config.Config.Firestore.ProjectID, options)
+		client, err = firestore.NewClientWithDatabase(ctx, config.Config.Firestore.ProjectID, "(default)", options)
 		if err != nil {
 			log.Fatalf("firebase.NewClient err: %v", err)
 		}
