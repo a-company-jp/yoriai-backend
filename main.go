@@ -24,5 +24,8 @@ func main() {
 
 	lineWHandler := handler.NewLINEWebhookHandler(lineBotSvc)
 	e.Any("/line/webhook", lineWHandler.Handle)
-	e.Run(":8080")
+
+	vonageWHService := handler.NewVonageWebhook()
+	e.Any("/vonage/webhook", vonageWHService.Handle)
+	e.Run(":11305")
 }
