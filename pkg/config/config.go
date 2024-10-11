@@ -20,7 +20,12 @@ func init() {
 		panic("No ENV_LOCATION found")
 		return
 	}
-	if err := yaml.Unmarshal([]byte(loc), &Config); err != nil {
+	body, err := os.ReadFile(loc)
+	if err != nil {
+		panic(fmt.Errorf("failed to read file: %w", err))
+		return
+	}
+	if err := yaml.Unmarshal(body, &Config); err != nil {
 		panic(fmt.Errorf("failed to unmarshal yaml: %w", err))
 		return
 	}
