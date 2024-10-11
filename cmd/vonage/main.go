@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -19,7 +18,7 @@ type LINEInput struct {
 	phoneNumber   string
 	receiverName  string
 	callerName    string
-	remindMessage sql.NullString
+	remindMessage string
 }
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 		phoneNumber:   "1234567890",
 		receiverName:  "Alisa",
 		callerName:    "Bob",
-		remindMessage: sql.NullString{String: "Don't forget to bring your umbrella", Valid: true},
+		remindMessage: "Don't forget to call your mom!",
 	}
 	err := CallPhoneApi(input)
 	if err != nil {
@@ -89,7 +88,7 @@ func CreateRequestBody(agentId string, input LINEInput) ([]byte, error) {
 			},
 			{
 				"name":  "REMIND_MESSAGE",
-				"value": input.remindMessage.String,
+				"value": input.remindMessage,
 			},
 		},
 	})
