@@ -3,8 +3,8 @@ package model
 import "time"
 
 type User struct {
+	Target
 	LINEID  string    `firestore:"line_id"`
-	Target  Target    `firestore:"target"`
 	AddDate time.Time `firestore:"add_date"`
 }
 
