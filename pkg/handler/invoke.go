@@ -24,7 +24,9 @@ func NewInvokeHandler(
 
 func (h *CallInvoke) Handle(c *gin.Context) {
 	// get time
-	timeVal := fmt.Sprintf("%02d:%02d", time.Now().Hour(), 0)
+	// specify tokyo and get hour
+	hour := time.Now().In(time.FixedZone("Asia/Tokyo", 9*60*60)).Hour()
+	timeVal := fmt.Sprintf("%02d:%02d", hour, 0)
 	slog.Info("invoke call", slog.String("time", timeVal))
 	res := h.fs.Collection("users").Where("call_time", "==", timeVal).Documents(c)
 	if res == nil {
