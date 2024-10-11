@@ -5,6 +5,7 @@ import (
 	"github.com/a-company/yoriai-backend/pkg/config"
 	"github.com/a-company/yoriai-backend/pkg/handler"
 	"github.com/a-company/yoriai-backend/pkg/service/line"
+	"github.com/a-company/yoriai-backend/pkg/util/firestore"
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"strconv"
@@ -25,7 +26,8 @@ func main() {
 		return
 	}
 
-	lineWHandler := handler.NewLINEWebhookHandler(lineBotSvc)
+	fs := firestore.New()
+	lineWHandler := handler.NewLINEWebhookHandler(lineBotSvc, fs)
 	e.Any("/line/webhook", lineWHandler.Handle)
 
 	vonageWHService := handler.NewVonageWebhook()
