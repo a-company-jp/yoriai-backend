@@ -95,7 +95,7 @@ func (l *LINEWebhookHandler) HandleFollowEvent(event webhook.FollowEvent) {
 		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "Failed to add you as a friend. Please try again later.")
 		return
 	}
-	l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "友達登録ありがとうございます！\n\nまずは電話対象者のニックネームを入力してください")
+	l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "友達登録ありがとうございます！\n\nまずはあなたのニックネームを入力してください")
 }
 
 func (l *LINEWebhookHandler) HandleUnfollowEvent(event webhook.UnfollowEvent) {
@@ -125,8 +125,17 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 	doc.DataTo(&userdata)
 
 	if userdata.Target.Nickname == "" {
-		event.Message.GetType()
 		userdata.Target.Nickname = txtMsg.Text
+		_, err := ref.Set(ctx, userdata)
+		if err != nil {
+			slog.Error("failed to set user", err)
+			return
+		}
+		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "次に相手のニックネームを入力してください")
+		return
+	}
+	if userdata.Target.RecipientNickname == "" {
+		userdata.Target.RecipientNickname = txtMsg.Text
 		_, err := ref.Set(ctx, userdata)
 		if err != nil {
 			slog.Error("failed to set user", err)
@@ -164,8 +173,24 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 			slog.Error("failed to set user", err)
 			return
 		}
-		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "登録が完了しました！")
+		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "最後にリマインドメッセージがある場合は入力してください。ない場合は「なし」と入力してください")
+		return
 	}
+	if userdata.Target.RemindMessage == "" && !userdata.Target.Confirm {
+		if txtMsg.Text == "なし" {
+			userdata.Target.Confirm = true
+		} else {
+			userdata.Target.RemindMessage = txtMsg.Text
+		}
+		_, err := ref.Set(ctx, userdata)
+		if err != nil {
+			slog.Error("failed to set user", err)
+			return
+		}
+		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "登録完了しました！")
+		return
+	}
+	l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "登録が完了しています！")
 }
 
 func (l *LINEWebhookHandler) HandleLeaveEvent(event webhook.UnfollowEvent) {
