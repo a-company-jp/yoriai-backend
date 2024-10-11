@@ -8,5 +8,5 @@ vonage:
   x_vgai_key:
   agent_id:
 firestore:
-  project_id:
+  project_id: yorisoi
   json_credential_file:
