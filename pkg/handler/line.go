@@ -7,6 +7,7 @@ import (
 	"github.com/a-company/yoriai-backend/pkg/model"
 	"github.com/a-company/yoriai-backend/pkg/service/line"
 	"github.com/gin-gonic/gin"
+	"github.com/line/line-bot-sdk-go/v8/linebot"
 	"github.com/line/line-bot-sdk-go/v8/linebot/webhook"
 	"log/slog"
 	"regexp"
@@ -68,6 +69,7 @@ func (l *LINEWebhookHandler) Handle(c *gin.Context) {
 			// module: When a user interacts with a module. You can reply to this event.
 		case "postback":
 			// postback: When a user triggers a postback action. You can reply to this event.
+			l.HandlePostbackEvent(event.(webhook.PostbackEvent))
 		case "things":
 			// things: When a user interacts with a LINE Things-compatible device. You can reply to this event.
 		case "unfollow":
@@ -159,23 +161,14 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 			slog.Error("failed to set user", err)
 			return
 		}
-		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "次に希望の通話時間を入力してください")
+		l.lineBotSvc.ReplyMessage(event.ReplyToken, []linebot.SendingMessage{line.CreateTimeSelectMessage()})
 		return
 	}
 	if userdata.Target.CallTime == "" {
-		userdata.Target.CallTime = txtMsg.Text
-		// 00:00形式
-		callTimeRgx := `^([01][0-9]|2[0-3]):00$`
-		if !regexp.MustCompile(callTimeRgx).MatchString(userdata.Target.CallTime) {
-			l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "通話時間の形式が正しくありません")
-			return
-		}
-		_, err := ref.Set(ctx, userdata)
-		if err != nil {
-			slog.Error("failed to set user", err)
-			return
-		}
-		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "最後にリマインドメッセージがある場合は入力してください。ない場合は「なし」と入力してください")
+		l.lineBotSvc.ReplyMessage(event.ReplyToken,
+			[]linebot.SendingMessage{
+				linebot.NewTextMessage("時間の指定方法が正しくありません。もう一度選択してください"),
+				line.CreateTimeSelectMessage()})
 		return
 	}
 	if userdata.Target.RemindMessage == "" && !userdata.Target.Confirm {
@@ -195,5 +188,30 @@ func (l *LINEWebhookHandler) HandleMessageEvent(event webhook.MessageEvent) {
 	l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "登録が完了しています！")
 }
 
-func (l *LINEWebhookHandler) HandleLeaveEvent(event webhook.UnfollowEvent) {
+func (l *LINEWebhookHandler) HandlePostbackEvent(event webhook.PostbackEvent) {
+	userID := event.Source.(webhook.UserSource).UserId
+	ctx := context.Background()
+	userdata := model.User{}
+	ref := l.fs.Collection("users").Doc(userID)
+	doc, err := ref.Get(ctx)
+	if err != nil {
+		slog.Error("failed to get user", err)
+		return
+	}
+	if err := doc.DataTo(&userdata); err != nil {
+		slog.Error("failed to load user", err)
+		return
+	}
+	timeRgx := regexp.MustCompile(`call_time_picker_(\d{2}:00)`)
+	if userdata.Target.CallTime == "" && timeRgx.MatchString(event.Postback.Data) {
+		userdata.Target.CallTime = timeRgx.FindStringSubmatch(event.Postback.Data)[1]
+		_, err := ref.Set(ctx, userdata)
+		if err != nil {
+			slog.Error("failed to set user", err)
+			return
+		}
+		l.lineBotSvc.ReplyTextMessage(event.ReplyToken, "最後にリマインドメッセージがある場合は入力してください。ない場合は「なし」と入力してください")
+		return
+	}
+
 }
