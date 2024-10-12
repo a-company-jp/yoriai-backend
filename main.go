@@ -30,7 +30,7 @@ func main() {
 	lineWHandler := handler.NewLINEWebhookHandler(lineBotSvc, fs)
 	e.Any("/line/webhook", lineWHandler.Handle)
 
-	vonageWHService := handler.NewVonageWebhook()
+	vonageWHService := handler.NewVonageWebhook(lineBotSvc, fs)
 	e.Any("/vonage/webhook", vonageWHService.Handle)
 	port := 8080
 	if config.Config.General.Port != "" {
