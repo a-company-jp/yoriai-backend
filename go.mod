@@ -4,10 +4,8 @@ go 1.23.1
 
 require (
 	cloud.google.com/go/firestore v1.17.0
-	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
-	github.com/line/line-bot-sdk-go/v7 v7.21.0
 	github.com/line/line-bot-sdk-go/v8 v8.9.0
 	google.golang.org/api v0.200.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -19,7 +17,6 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	cloud.google.com/go/longrunning v0.6.1 // indirect
-	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/bytedance/sonic v1.12.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
