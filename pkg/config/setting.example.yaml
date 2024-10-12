@@ -9,4 +9,5 @@ vonage:
   agent_id:
 firestore:
   project_id: yorisoi
+  database_id:
   json_credential_file:
