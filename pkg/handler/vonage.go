@@ -49,8 +49,8 @@ func (v *VonageWebhook) Handle(c *gin.Context) {
 
 	notifyText := "本日の通話が終了しました\n\n"
 	notifyText += fmt.Sprintf("気分: 元気\n")
-	notifyText += fmt.Sprintf("今日の通話のサマリー: 今日の朝おにぎりを食べた。\n")
-	notifyText += fmt.Sprintf("伝言: 今日はハッカソンに出てます。\n")
+	notifyText += fmt.Sprintf("今日の通話のサマリー: 今ハッカソンに出ています。\n")
+	notifyText += fmt.Sprintf("伝言: 今度会いたいです。\n")
 
 	slog.Info("notifyText", slog.String("notifyText", notifyText))
 	if err := v.line.PushTextMessage(userdata.LINEID, notifyText); err != nil {
