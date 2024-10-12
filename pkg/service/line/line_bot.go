@@ -35,6 +35,14 @@ func (l *LINEBotService) ReplyMessage(replyToken string, flexMessage []linebot.S
 	}
 }
 
+func (l *LINEBotService) PushTextMessage(to, message string) error {
+	if _, err := l.client.PushMessage(to, linebot.NewTextMessage(message)).Do(); err != nil {
+		slog.Error("failed to push message", err)
+		return err
+	}
+	return nil
+}
+
 func CreateTimeSelectMessage() *linebot.FlexMessage {
 	bubble := &linebot.BubbleContainer{
 		Type: linebot.FlexContainerTypeBubble,
